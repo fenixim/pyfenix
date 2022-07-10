@@ -21,7 +21,10 @@ def handler_thread(gui, api):
     thread = threading.Thread(target=handler.run, daemon=True)
     thread.start()
 
+    return thread
+
 def test_given_no_new_messages_when_poll_then_gui_will_not_change(gui):
+    time.sleep(0.2)
     assert not gui.get_messages()
 
 def test_given_one_new_message_when_poll_then_gui_will_show_it(gui, api):
@@ -32,3 +35,8 @@ def test_given_one_new_message_when_poll_then_gui_will_show_it(gui, api):
 def test_given_gui_when_gui_sends_message_then_loop_will_send_to_api(gui, api):
     gui.send_message("yay")
     assert api.get_sent() == "yay"
+
+def test_given_gui_when_gui_quits_then_loop_will_die(gui, handler_thread):
+    gui.quit()
+    handler_thread.join(0.2)
+    assert not handler_thread.is_alive()

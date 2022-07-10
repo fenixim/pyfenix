@@ -5,7 +5,10 @@ class ClientAPIStub:
         self._sent = None
 
     def poll_messages(self):
-        return self._messages
+        messages = self._messages
+        if messages:
+            self._messages = []
+        return messages
 
     def send_message(self, msg):
         self._sent = msg        

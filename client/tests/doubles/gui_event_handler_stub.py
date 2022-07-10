@@ -4,9 +4,7 @@ class GUIEventHandlerStub:
         self._messages = []
         self._quit = False
         self._event_cb_on_send = lambda *args: None
-
-    def has_quit(self):
-        return self._quit
+        self._event_cb_on_quit = lambda *args: None
 
     def add_messages(self, messages):
         self._messages.extend(messages)
@@ -21,3 +19,6 @@ class GUIEventHandlerStub:
 
     def set_cb(self, name, cb):
         setattr(self, f"_event_cb_{name}", cb)
+
+    def quit(self):
+        self._event_cb_on_quit()

@@ -10,7 +10,10 @@ class ClientEventLoop:
         """
         self._api = client_api
         self._gui = client_gui
+        self._quit = False
+
         self._gui.set_cb("on_send", self._api.send_message)
+        self._gui.set_cb("on_quit", self.kill)
 
     def run(self):
         """
@@ -18,5 +21,11 @@ class ClientEventLoop:
 
         Polls for messages and updates the GUI.
         """
-        while not self._gui.has_quit():
+        while not self._quit:
             self._gui.add_messages(self._api.poll_messages())
+
+    def kill(self):
+        """
+        Kill the loop cleanly
+        """
+        self._quit = True
