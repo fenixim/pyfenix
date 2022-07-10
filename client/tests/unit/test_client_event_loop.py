@@ -1,39 +1,34 @@
 import threading
+import time
+
+import pytest
 
 from fenix import ClientEventLoop
 from tests.doubles import ClientAPIStub
 from tests.doubles import GUIEventHandlerStub
 
-def test_given_no_new_messages_when_poll_then_gui_will_not_change():
-    gui = GUIEventHandlerStub()
-    handler = ClientEventLoop(ClientAPIStub(), gui)
-    handler_thread = threading.Thread(target=handler.run, daemon=True)
+@pytest.fixture
+def gui():
+    return GUIEventHandlerStub()
 
-    handler_thread.start()
-    handler_thread.join(0.2)
+@pytest.fixture
+def api():
+    return ClientAPIStub()
+
+@pytest.fixture(autouse=True)
+def handler_thread(gui, api):
+    handler = ClientEventLoop(api, gui)
+    thread = threading.Thread(target=handler.run, daemon=True)
+    thread.start()
+
+def test_given_no_new_messages_when_poll_then_gui_will_not_change(gui):
     assert not gui.get_messages()
 
-def test_given_one_new_message_when_poll_then_gui_will_have_that_message():
-    gui = GUIEventHandlerStub()
-    api = ClientAPIStub()
-    handler = ClientEventLoop(api, gui)
-    handler_thread = threading.Thread(target=handler.run, daemon=True)
-
-    handler_thread.start()
+def test_given_one_new_message_when_poll_then_gui_will_show_it(gui, api):
     api.set_messages(["yay", "yeet"])
-    handler_thread.join(0.2)
-
-    assert not handler_thread.is_alive()
+    time.sleep(0.2)
     assert gui.get_messages() == ["yay", "yeet"]
 
-def test_given_gui_when_gui_sends_message_then_loop_will_send_to_api():
-    gui = GUIEventHandlerStub()
-    api = ClientAPIStub()
-    handler = ClientEventLoop(api, gui)
-    handler_thread = threading.Thread(target=handler.run, daemon=True)
-
-    handler_thread.start()
+def test_given_gui_when_gui_sends_message_then_loop_will_send_to_api(gui, api):
     gui.send_message("yay")
-    handler_thread.join(0.2)
-
     assert api.get_sent() == "yay"
