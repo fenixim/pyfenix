@@ -1,4 +1,4 @@
-class GRPCClientAPIStub:
+class ClientAPIStub:
 
     def __init__(self):
         self._messages = []
