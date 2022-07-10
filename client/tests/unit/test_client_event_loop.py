@@ -25,3 +25,15 @@ def test_given_one_new_message_when_poll_then_gui_will_have_that_message():
 
     assert not handler_thread.is_alive()
     assert gui.get_messages() == ["yay", "yeet"]
+
+def test_given_gui_when_gui_sends_message_then_loop_will_send_to_api():
+    gui = GUIEventHandlerStub()
+    api = ClientAPIStub()
+    handler = ClientEventLoop(api, gui)
+    handler_thread = threading.Thread(target=handler.run, daemon=True)
+
+    handler_thread.start()
+    gui.send_message("yay")
+    handler_thread.join(0.2)
+
+    assert api.get_sent() == "yay"

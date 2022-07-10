@@ -10,6 +10,7 @@ class ClientEventLoop:
         """
         self._api = client_api
         self._gui = client_gui
+        self._gui.set_cb("on_send", self._api.send_message)
 
     def run(self):
         """
