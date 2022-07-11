@@ -14,6 +14,7 @@ class ClientEventLoop:
         self._api = client_api
         self._gui = client_gui
         self._queue = event_queue
+        self._done = False
 
     def run(self):
         """
@@ -21,7 +22,7 @@ class ClientEventLoop:
 
         Polls for messages and updates the GUI.
         """
-        while True:
+        while not self._done:
             self.handle_next_event()
 
     def handle_next_event(self):
@@ -38,5 +39,7 @@ class ClientEventLoop:
             self._gui.conn_failed()
         elif event_type == Event.MSG_SEND:
             self._api.send(payload)
+        elif event_type == Event.QUIT:
+            self._done = True
         else:
             self._gui.add_message(payload)

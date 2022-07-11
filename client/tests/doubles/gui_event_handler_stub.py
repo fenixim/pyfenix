@@ -21,3 +21,6 @@ class GUIEventHandlerStub:
 
     def set_send(self, msg):
         self._queue.put((Event.MSG_SEND, msg))
+
+    def quit(self):
+        self._queue.put((Event.QUIT, None))

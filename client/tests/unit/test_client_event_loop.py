@@ -1,4 +1,5 @@
 import queue
+import threading
 
 import pytest
 
@@ -47,3 +48,9 @@ def test_when_fail_to_connect_will_show_connection_error(api, gui, handler):
     handler.handle_next_event()
     assert gui.is_connection_failed()
 
+def test_quit_event_is_timely(gui, handler):
+    runner = threading.Thread(target=handler.run, daemon=True)
+    runner.start()
+    gui.quit()
+    runner.join(0.1)
+    assert not runner.is_alive()

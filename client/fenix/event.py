@@ -7,3 +7,4 @@ class Event(enum.Enum):
     CONN_FAIL = enum.auto()
     MSG_RECV = enum.auto()
     MSG_SEND = enum.auto()
+    QUIT = enum.auto()
