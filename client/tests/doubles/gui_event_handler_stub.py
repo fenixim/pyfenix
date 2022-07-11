@@ -1,8 +1,11 @@
+from fenix import Event
+
 class GUIEventHandlerStub:
 
-    def __init__(self):
+    def __init__(self, queue):
         self._conn_failed = False
         self._messages = []
+        self._queue = queue
 
     def add_message(self, message):
         self._messages.append(message)
@@ -15,3 +18,6 @@ class GUIEventHandlerStub:
 
     def is_connection_failed(self):
         return self._conn_failed
+
+    def set_send(self, msg):
+        self._queue.put((Event.MSG_SEND, msg))

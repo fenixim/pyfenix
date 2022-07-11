@@ -32,8 +32,9 @@ class ClientEventLoop:
 
         event_type, payload = event
 
-        print(event_type)
         if event_type == Event.CONN_FAIL:
             self._gui.conn_failed()
+        elif event_type == Event.MSG_SEND:
+            self._api.send(payload)
         else:
             self._gui.add_message(payload)

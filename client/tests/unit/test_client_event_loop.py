@@ -1,5 +1,6 @@
 import threading
 import time
+import queue
 
 import pytest
 
@@ -8,12 +9,16 @@ from tests.doubles import ClientAPIStub
 from tests.doubles import GUIEventHandlerStub
 
 @pytest.fixture
-def api():
-    return ClientAPIStub()
+def event_queue():
+    return queue.Queue()
 
 @pytest.fixture
-def gui():
-    return GUIEventHandlerStub()
+def api(event_queue):
+    return ClientAPIStub(event_queue)
+
+@pytest.fixture
+def gui(event_queue):
+    return GUIEventHandlerStub(event_queue)
 
 @pytest.fixture
 def handler(api, gui):
@@ -34,7 +39,13 @@ def test_given_two_messages_when_poll_twice_will_show_two(api, gui, handler):
     handler.handle_next_event()
     assert gui.get_messages() == ["yay", "yeet"]
 
+def test_when_send_message_will_send_through_api(api, gui, handler):
+    gui.set_send("yay")
+    handler.handle_next_event()
+    assert api.get_sent() == "yay"
+
 def test_when_fail_to_connect_will_show_connection_error(api, gui, handler):
     api.fail_connect()
     handler.handle_next_event()
     assert gui.is_connection_failed()
+
