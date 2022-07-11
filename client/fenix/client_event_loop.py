@@ -1,5 +1,7 @@
 """Event handler loop for all client events."""
 
+from fenix.event import Event
+
 class ClientEventLoop:
     """Updates GUI on new events. Should not be run in main thread."""
 
@@ -25,5 +27,13 @@ class ClientEventLoop:
         Handle one event off the queue
         """
         event = self._api.get()
-        if event:
-            self._gui.add_message(event)
+        if not event:
+            return
+
+        event_type, payload = event
+
+        print(event_type)
+        if event_type == Event.CONN_FAIL:
+            self._gui.conn_failed()
+        else:
+            self._gui.add_message(payload)

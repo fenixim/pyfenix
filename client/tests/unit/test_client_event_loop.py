@@ -33,3 +33,8 @@ def test_given_two_messages_when_poll_twice_will_show_two(api, gui, handler):
     handler.handle_next_event()
     handler.handle_next_event()
     assert gui.get_messages() == ["yay", "yeet"]
+
+def test_when_fail_to_connect_will_show_connection_error(api, gui, handler):
+    api.fail_connect()
+    handler.handle_next_event()
+    assert gui.is_connection_failed()
