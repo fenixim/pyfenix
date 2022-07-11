@@ -5,13 +5,14 @@ from fenix.event import Event
 class ClientEventLoop:
     """Updates GUI on new events. Should not be run in main thread."""
 
-    def __init__(self, client_api, client_gui):
+    def __init__(self, event_queue, client_api, client_gui):
         """
         :param client_api: API implementation of the Fenix protocol
         :param client_gui: GUI implementation
         """
         self._api = client_api
         self._gui = client_gui
+        self._queue = event_queue
 
     def run(self):
         """
@@ -26,10 +27,10 @@ class ClientEventLoop:
         """
         Handle one event off the queue
         """
-        event = self._api.get()
-        if not event:
+        if self._queue.empty():
             return
 
+        event = self._queue.get_nowait()
         event_type, payload = event
 
         if event_type == Event.CONN_FAIL:

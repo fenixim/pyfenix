@@ -21,8 +21,8 @@ def gui(event_queue):
     return GUIEventHandlerStub(event_queue)
 
 @pytest.fixture
-def handler(api, gui):
-    return ClientEventLoop(api, gui)
+def handler(event_queue, api, gui):
+    return ClientEventLoop(event_queue, api, gui)
 
 def test_given_no_new_messages_when_poll_will_not_change_gui(gui, handler):
     handler.handle_next_event()

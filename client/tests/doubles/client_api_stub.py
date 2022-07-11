@@ -6,10 +6,6 @@ class ClientAPIStub:
         self._sent = None
         self._queue = queue
 
-    def get(self):
-        if not self._queue.empty():
-            return self._queue.get_nowait()
-
     def set_messages(self, messages):
         for msg in messages:
             self._queue.put((Event.MSG_RECV, msg))
