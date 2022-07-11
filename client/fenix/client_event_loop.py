@@ -7,6 +7,7 @@ class ClientEventLoop:
 
     def __init__(self, event_queue, client_api, client_gui):
         """
+        :param event_queue: Event queue shared by the API and GUI layers
         :param client_api: API implementation of the Fenix protocol
         :param client_gui: GUI implementation
         """
