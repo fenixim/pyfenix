@@ -8,35 +8,28 @@ from tests.doubles import ClientAPIStub
 from tests.doubles import GUIEventHandlerStub
 
 @pytest.fixture
+def api():
+    return ClientAPIStub()
+
+@pytest.fixture
 def gui():
     return GUIEventHandlerStub()
 
 @pytest.fixture
-def api():
-    return ClientAPIStub()
+def handler(api, gui):
+    return ClientEventLoop(api, gui)
 
-@pytest.fixture(autouse=True)
-def handler_thread(gui, api):
-    handler = ClientEventLoop(api, gui)
-    thread = threading.Thread(target=handler.run, daemon=True)
-    thread.start()
-
-    return thread
-
-def test_given_no_new_messages_when_poll_then_gui_will_not_change(gui):
-    time.sleep(0.2)
+def test_given_no_new_messages_when_poll_will_not_change_gui(gui, handler):
+    handler.handle_next_event()
     assert not gui.get_messages()
 
-def test_given_one_new_message_when_poll_then_gui_will_show_it(gui, api):
+def test_given_two_messages_when_poll_will_show_first(api, gui, handler):
     api.set_messages(["yay", "yeet"])
-    time.sleep(0.2)
+    handler.handle_next_event()
+    assert gui.get_messages() == ["yay"]
+
+def test_given_two_messages_when_poll_twice_will_show_two(api, gui, handler):
+    api.set_messages(["yay", "yeet"])
+    handler.handle_next_event()
+    handler.handle_next_event()
     assert gui.get_messages() == ["yay", "yeet"]
-
-def test_given_gui_when_gui_sends_message_then_loop_will_send_to_api(gui, api):
-    gui.send_message("yay")
-    assert api.get_sent() == "yay"
-
-def test_given_gui_when_gui_quits_then_loop_will_die(gui, handler_thread):
-    gui.quit()
-    handler_thread.join(0.2)
-    assert not handler_thread.is_alive()
