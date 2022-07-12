@@ -3,7 +3,7 @@ import threading
 
 import pytest
 
-from fenix import ClientEventLoop
+from pyfenix import ClientEventLoop
 from tests.doubles import ClientAPIStub
 from tests.doubles import GUIEventHandlerStub
 

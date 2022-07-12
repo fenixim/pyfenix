@@ -1,4 +1,4 @@
-from fenix import Event
+from pyfenix import Event
 
 class GUIEventHandlerStub:
 

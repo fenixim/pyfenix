@@ -1,6 +1,6 @@
 """Event handler loop for all client events."""
 
-from fenix.event import Event
+from pyfenix.event import Event
 
 class ClientEventLoop:
     """Updates GUI on new events. Should not be run in main thread."""
