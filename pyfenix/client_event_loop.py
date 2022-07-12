@@ -1,5 +1,6 @@
 """Event handler loop for all client events."""
 
+import logging
 import queue
 
 from pyfenix.api import API
@@ -39,11 +40,13 @@ class ClientEventLoop:
         event = self._queue.get()
         event_type, payload = event
 
-        if event_type == Event.CONN_FAIL:
-            self._gui.conn_failed()
+        if event_type == Event.MSG_RECV:
+            self._gui.add_message(payload)
         elif event_type == Event.MSG_SEND:
             self._api.send(payload)
+        elif event_type == Event.CONN_FAIL:
+            self._gui.conn_failed()
         elif event_type == Event.QUIT:
             self._done = True
         else:
-            self._gui.add_message(payload)
+            logging.error(f"Unrecognized event type {event_type}")
