@@ -7,7 +7,7 @@ from tests.doubles import ClientAPIStub, GUIEventHandlerStub
 
 from .client_event_loop import ClientEventLoop
 
-event_queue = queue.Queue()
+event_queue: queue.Queue = queue.Queue()
 api = ClientAPIStub(event_queue)
 gui = GUIEventHandlerStub(event_queue)
 

@@ -1,11 +1,15 @@
 """Event handler loop for all client events."""
 
+import queue
+
+from pyfenix.api import API
 from pyfenix.event import Event
+from pyfenix.gui import GUI
 
 class ClientEventLoop:
     """Updates GUI on new events. Should not be run in main thread."""
 
-    def __init__(self, event_queue, client_api, client_gui):
+    def __init__(self, event_queue: queue.Queue, client_api: API, client_gui: GUI):
         """
         :param event_queue: Event queue shared by the API and GUI layers
         :param client_api: API implementation of the Fenix protocol
@@ -16,7 +20,7 @@ class ClientEventLoop:
         self._queue = event_queue
         self._done = False
 
-    def run(self):
+    def run(self) -> None:
         """
         Start the loop
 
@@ -25,7 +29,7 @@ class ClientEventLoop:
         while not self._done:
             self.handle_next_event()
 
-    def handle_next_event(self):
+    def handle_next_event(self) -> None:
         """
         Handle one event off the queue
         """

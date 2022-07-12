@@ -1,10 +1,14 @@
+import queue
+from typing import List
+
 from pyfenix import Event
+from pyfenix import GUI
 
-class GUIEventHandlerStub:
+class GUIEventHandlerStub(GUI):
 
-    def __init__(self, queue):
+    def __init__(self, queue: queue.Queue):
         self._conn_failed = False
-        self._messages = []
+        self._messages: List[str] = []
         self._queue = queue
 
     def add_message(self, message):

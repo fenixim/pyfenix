@@ -1,8 +1,11 @@
+import queue
+
+from pyfenix import API
 from pyfenix import Event
 
-class ClientAPIStub:
+class ClientAPIStub(API):
 
-    def __init__(self, queue):
+    def __init__(self, queue: queue.Queue):
         self._sent = None
         self._queue = queue
 
