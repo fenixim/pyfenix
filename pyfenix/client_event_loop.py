@@ -36,7 +36,7 @@ class ClientEventLoop:
         if self._queue.empty():
             return
 
-        event = self._queue.get_nowait()
+        event = self._queue.get()
         event_type, payload = event
 
         if event_type == Event.CONN_FAIL:
