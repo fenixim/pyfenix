@@ -3,6 +3,8 @@
 import queue
 from typing import Tuple
 
+import websockets.client
+
 from pyfenix.api import API
 from pyfenix.event import Event
 
@@ -15,7 +17,7 @@ class WebsocketsAPI(API):
         """
         self._queue = event_queue
 
-    def connect(self, server: Tuple[int, str]) -> None:
+    async def connect(self, server: Tuple[str, int]) -> None:
         """
         Establish a connection to a Fenix server
 
@@ -23,4 +25,22 @@ class WebsocketsAPI(API):
 
         :param server: (address, port) pair, for example ("127.0.0.1", 21337)
         """
-        self._queue.put((Event.CONN_FAIL, ""))
+        address, port = server
+        uri = f"ws://{address}:{port}"
+        try:
+            async with websockets.client.connect(uri):
+                pass
+        except (ConnectionRefusedError, OSError):
+            self._queue.put((Event.CONN_FAIL, ""))
+
+    def send(self, msg: str) -> None:
+        """
+        Send a message to the server
+        """
+        raise NotImplementedError()
+
+    async def recv_event(self) -> None:
+        """
+        Recv one event from the server and parse it into the queue
+        """
+        self._queue.put((Event.MSG_RECV, "yay"))
