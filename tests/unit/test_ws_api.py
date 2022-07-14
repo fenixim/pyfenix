@@ -3,7 +3,7 @@ import queue
 import pytest
 import websockets
 
-from pyfenix import WebsocketsAPI, Event
+from pyfenix import WebsocketsAPI, Event, NoConnectionError
 
 @pytest.fixture
 def event_queue():
@@ -36,10 +36,11 @@ async def test_when_recv_will_queue_event(api, event_queue, server_fac):
     async with server:
         await api.connect(("localhost", port))
         await api.recv_event()
+        await api.close()
 
     assert event_queue.get_nowait() == (Event.MSG_RECV, "yay")
 
-async def test_when_recv_empty_message_will_ignore(api, event_queue, server_fac):
+async def test_ignores_empty_messages(api, event_queue, server_fac):
     async def send_nothing(conn):
         await conn.send('{"type": "msg_send", "message": ""}')
 
@@ -47,5 +48,27 @@ async def test_when_recv_empty_message_will_ignore(api, event_queue, server_fac)
     async with server:
         await api.connect(("localhost", port))
         await api.recv_event()
+        await api.close()
 
     assert event_queue.empty()
+
+async def test_ignores_unrecognized_protocols(api, event_queue, server_fac):
+    async def send_bad_protocol(conn):
+        await conn.send('{"type": "does_not_exist", "message": "oof"}')
+
+    server, port = server_fac(send_bad_protocol)
+    async with server:
+        await api.connect(("localhost", port))
+        await api.recv_event()
+        await api.close()
+
+    assert event_queue.empty()
+
+async def test_recv_after_close_raises_error(api, event_queue, server_fac):
+    server, port = server_fac(lambda x: None)
+    async with server:
+        await api.connect(("localhost", port))
+        await api.close()
+
+    with pytest.raises(NoConnectionError):
+        await api.recv_event()

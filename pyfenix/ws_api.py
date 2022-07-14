@@ -1,6 +1,7 @@
 """Implementation of the client API layer for websockets"""
 
 import json
+import logging
 import queue
 from typing import Optional, Tuple
 
@@ -36,6 +37,16 @@ class WebsocketsAPI(API):
         except (ConnectionRefusedError, OSError):
             self._queue.put((Event.CONN_FAIL, ""))
 
+    async def close(self) -> None:
+        """
+        Closes the connection to the Fenix server
+
+        Safe to call more than once
+        """
+        if self._conn is not None:
+            await self._conn.close()
+            self._conn = None
+
     def send(self, msg: str) -> None:
         """
         Send a message to the server
@@ -47,8 +58,14 @@ class WebsocketsAPI(API):
         Recv one event from the server and parse it into the queue
         """
         if self._conn is None:
-            return
+            raise NoConnectionError()
 
         msg = json.loads(await self._conn.recv())
-        if msg['message']:
-            self._queue.put((Event.MSG_RECV, "yay"))
+        if msg["type"] == "msg_send":
+            if msg["message"]:
+                self._queue.put((Event.MSG_RECV, "yay"))
+        else:
+            logging.warning("Unrecognized protocol %s", msg["type"])
+
+class NoConnectionError(Exception):
+    """Represents an attempt to use the API without a connection"""
