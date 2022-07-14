@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 
 import websockets.client
 
-from pyfenix.api import API
+from pyfenix.api import API, NoConnectionError
 from pyfenix.event import Event
 
 class WebsocketsAPI(API):
@@ -66,6 +66,3 @@ class WebsocketsAPI(API):
                 self._queue.put((Event.MSG_RECV, "yay"))
         else:
             logging.warning("Unrecognized protocol %s", msg["type"])
-
-class NoConnectionError(Exception):
-    """Represents an attempt to use the API without a connection"""

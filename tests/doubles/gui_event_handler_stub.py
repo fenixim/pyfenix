@@ -12,6 +12,7 @@ class GUIEventHandlerStub(GUI):
         self._queue = queue
 
     def add_message(self, message):
+        print(f"Got message {message}")
         self._messages.append(message)
 
     def get_messages(self):
