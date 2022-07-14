@@ -1,7 +1,8 @@
 """Implementation of the client API layer for websockets"""
 
+import json
 import queue
-from typing import Tuple
+from typing import Optional, Tuple
 
 import websockets.client
 
@@ -16,6 +17,7 @@ class WebsocketsAPI(API):
         :param event_queue: Event queue shared by the event loop and GUI
         """
         self._queue = event_queue
+        self._server_uri: Optional[str] = None
 
     async def connect(self, server: Tuple[str, int]) -> None:
         """
@@ -26,9 +28,10 @@ class WebsocketsAPI(API):
         :param server: (address, port) pair, for example ("127.0.0.1", 21337)
         """
         address, port = server
-        uri = f"ws://{address}:{port}"
+        self._server_uri = f"ws://{address}:{port}"
+
         try:
-            async with websockets.client.connect(uri):
+            async with websockets.client.connect(self._server_uri):
                 pass
         except (ConnectionRefusedError, OSError):
             self._queue.put((Event.CONN_FAIL, ""))
@@ -43,4 +46,10 @@ class WebsocketsAPI(API):
         """
         Recv one event from the server and parse it into the queue
         """
-        self._queue.put((Event.MSG_RECV, "yay"))
+        if self._server_uri is None:
+            return
+
+        async with websockets.client.connect(self._server_uri) as conn:
+            msg = json.loads(await conn.recv())
+        if msg['message']:
+            self._queue.put((Event.MSG_RECV, "yay"))
