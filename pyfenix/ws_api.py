@@ -16,6 +16,7 @@ class WebsocketsAPI(API):
         """
         :param event_queue: Event queue shared by the event loop and GUI
         """
+        self._conn: Optional[pyfenix.client.WebSocketClientProtocol] = None
         self._queue = event_queue
         self._server_uri: Optional[str] = None
 
@@ -31,8 +32,7 @@ class WebsocketsAPI(API):
         self._server_uri = f"ws://{address}:{port}"
 
         try:
-            async with websockets.client.connect(self._server_uri):
-                pass
+            self._conn = await websockets.client.connect(self._server_uri)
         except (ConnectionRefusedError, OSError):
             self._queue.put((Event.CONN_FAIL, ""))
 
@@ -46,10 +46,9 @@ class WebsocketsAPI(API):
         """
         Recv one event from the server and parse it into the queue
         """
-        if self._server_uri is None:
+        if self._conn is None:
             return
 
-        async with websockets.client.connect(self._server_uri) as conn:
-            msg = json.loads(await conn.recv())
+        msg = json.loads(await self._conn.recv())
         if msg['message']:
             self._queue.put((Event.MSG_RECV, "yay"))
