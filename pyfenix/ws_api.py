@@ -16,7 +16,7 @@ class WebsocketsAPI(API):
         """
         :param event_queue: Event queue shared by the event loop and GUI
         """
-        self._conn: Optional[pyfenix.client.WebSocketClientProtocol] = None
+        self._conn: Optional[websockets.client.WebSocketClientProtocol] = None
         self._queue = event_queue
         self._server_uri: Optional[str] = None
 
@@ -24,7 +24,7 @@ class WebsocketsAPI(API):
         """
         Establish a connection to a Fenix server
 
-        The connection is automatically failed, because it isn't implemented.
+        An Event.CONN_FAIL event will be generated if the connection fails.
 
         :param server: (address, port) pair, for example ("127.0.0.1", 21337)
         """
