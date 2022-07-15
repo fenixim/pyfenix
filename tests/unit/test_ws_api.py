@@ -40,7 +40,7 @@ async def test_when_recv_will_queue_event(api, event_queue, server_fac):
 
     assert event_queue.get_nowait() == (Event.MSG_RECV, "yay")
 
-async def test_ignores_empty_messages(api, event_queue, server_fac):
+async def test_client_api_ignores_empty_messages(api, event_queue, server_fac):
     async def send_nothing(conn):
         await conn.send('{"type": "msg_send", "message": ""}')
 
