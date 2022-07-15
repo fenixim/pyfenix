@@ -16,7 +16,7 @@ class ClientAPIStub(API):
     def fail_connect(self):
         self._queue.put((Event.CONN_FAIL, None))
 
-    def send(self, msg):
+    async def send(self, msg):
         self._sent = msg
 
     def get_sent(self):

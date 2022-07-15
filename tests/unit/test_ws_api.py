@@ -72,3 +72,17 @@ async def test_recv_after_close_raises_error(api, event_queue, server_fac):
 
     with pytest.raises(NoConnectionError):
         await api.recv_event()
+
+async def test_sends_messages_in_correct_format(api, event_queue, server_fac):
+    message = None
+    async def extract_message(conn):
+        nonlocal message
+        message = await conn.recv()
+
+    server, port = server_fac(extract_message)
+    async with server:
+        await api.connect(("localhost", port))
+        await api.send("yay")
+        await api.close()
+
+    assert message == '{"type": "msg_send", "message": "yay"}'

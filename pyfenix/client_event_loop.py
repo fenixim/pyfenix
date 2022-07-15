@@ -1,5 +1,6 @@
 """Event handler loop for all client events."""
 
+import asyncio
 import logging
 import queue
 
@@ -43,7 +44,7 @@ class ClientEventLoop:
         if event_type == Event.MSG_RECV:
             self._gui.add_message(payload)
         elif event_type == Event.MSG_SEND:
-            self._api.send(payload)
+            asyncio.get_event_loop().run_until_complete(self._api.send(payload))
         elif event_type == Event.CONN_FAIL:
             self._gui.conn_failed()
         elif event_type == Event.QUIT:

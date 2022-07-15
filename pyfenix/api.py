@@ -18,7 +18,7 @@ class API:
         while True:
             await self.recv_event()
 
-    def send(self, msg: str) -> None:
+    async def send(self, msg: str) -> None:
         """
         Send a message to the server
         """

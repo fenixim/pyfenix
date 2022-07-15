@@ -47,11 +47,14 @@ class WebsocketsAPI(API):
             await self._conn.close()
             self._conn = None
 
-    def send(self, msg: str) -> None:
+    async def send(self, msg: str) -> None:
         """
         Send a message to the server
         """
-        raise NotImplementedError()
+        payload = {"type" : "msg_send", "message": msg}
+
+        if self._conn is not None:
+            await self._conn.send(json.dumps(payload))
 
     async def recv_event(self) -> None:
         """

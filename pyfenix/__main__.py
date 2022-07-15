@@ -14,6 +14,7 @@ async def main() -> None:
     event_queue: Queue = Queue()
     api = WebsocketsAPI(event_queue)
     await api.connect(("localhost", 60221))
+    await api.send("yay")
     asyncio.create_task(api.listen())
 
     gui = GUIEventHandlerStub(event_queue)
