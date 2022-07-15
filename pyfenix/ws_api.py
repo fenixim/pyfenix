@@ -48,9 +48,6 @@ class WebsocketsAPI(API):
             self._conn = None
 
     async def send(self, msg: str) -> None:
-        """
-        Send a message to the server
-        """
         payload = {"type" : "msg_send", "message": msg}
 
         if self._conn is not None:
