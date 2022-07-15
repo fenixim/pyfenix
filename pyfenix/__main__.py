@@ -10,7 +10,7 @@ from .client_event_loop import ClientEventLoop
 from .ws_api import WebsocketsAPI
 
 async def main() -> None:
-    """Run Fenix"""
+    """Start Fenix client"""
     event_queue: Queue = Queue()
     api = WebsocketsAPI(event_queue)
     await api.connect(("localhost", 60221))
