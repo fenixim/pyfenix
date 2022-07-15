@@ -1,4 +1,4 @@
-"""Fenix runner"""
+"""Fenix client runner"""
 
 import asyncio
 from queue import Queue
