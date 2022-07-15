@@ -55,7 +55,7 @@ class WebsocketsAPI(API):
 
     async def recv_event(self) -> None:
         """
-        Recv one event from the server and parse it into the queue
+        Parse one server protocol into an event and add it to the queue
         """
         if self._conn is None:
             raise NoConnectionError()
