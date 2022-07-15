@@ -11,7 +11,7 @@ from pyfenix.api import API, NoConnectionError
 from pyfenix.event import Event
 
 class WebsocketsAPI(API):
-    """Fenix client API using websockets."""
+    """Fenix client APIs."""
 
     def __init__(self, event_queue: queue.Queue):
         """
