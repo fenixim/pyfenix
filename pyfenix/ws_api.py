@@ -20,6 +20,7 @@ class WebsocketsAPI(API):
         self._conn: Optional[websockets.client.WebSocketClientProtocol] = None
         self._queue = event_queue
         self._server_uri: Optional[str] = None
+        super().__init__()
 
     async def connect(self, server: Tuple[str, int]) -> None:
         """
@@ -44,8 +45,10 @@ class WebsocketsAPI(API):
         Safe to call more than once.
         """
         if self._conn is not None:
+            self._done = True
             await self._conn.close()
             self._conn = None
+
 
     async def send(self, msg: str) -> None:
         payload = {"type" : "msg_send", "message": msg}
