@@ -61,7 +61,7 @@ class WebsocketsAPI(API):
             raise NoConnectionError()
 
         msg = json.loads(await self._conn.recv())
-        if msg["type"] == "msg_send":
+        if msg["type"] == "msg_broadcast":
             text = msg["message"]
             if text:
                 self._queue.put((Event.MSG_RECV, text))

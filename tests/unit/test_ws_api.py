@@ -31,7 +31,7 @@ async def test_when_server_is_not_running_will_fail_connect(unused_tcp_port):
 @pytest.mark.parametrize("test_case", ["yay", "hax"])
 async def test_recv_correct_message(api, event_queue, server_fac, test_case):
     async def send_to_server(conn):
-        await conn.send('{"type": "msg_send", "message": "%s"}' % test_case)
+        await conn.send('{"type": "msg_broadcast", "message": "%s"}' % test_case)
 
     server, port = server_fac(send_to_server)
     async with server:
@@ -43,7 +43,7 @@ async def test_recv_correct_message(api, event_queue, server_fac, test_case):
 
 async def test_client_api_ignores_empty_messages(api, event_queue, server_fac):
     async def send_nothing(conn):
-        await conn.send('{"type": "msg_send", "message": ""}')
+        await conn.send('{"type": "msg_broadcast", "message": ""}')
 
     server, port = server_fac(send_nothing)
     async with server:
