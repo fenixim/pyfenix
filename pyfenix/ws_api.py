@@ -62,7 +62,8 @@ class WebsocketsAPI(API):
 
         msg = json.loads(await self._conn.recv())
         if msg["type"] == "msg_send":
-            if msg["message"]:
-                self._queue.put((Event.MSG_RECV, "yay"))
+            text = msg["message"]
+            if text:
+                self._queue.put((Event.MSG_RECV, text))
         else:
             logging.warning("Unrecognized protocol %s", msg["type"])

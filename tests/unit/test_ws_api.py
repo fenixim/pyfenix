@@ -28,17 +28,18 @@ async def test_when_server_is_not_running_will_fail_connect(unused_tcp_port):
     await api.connect(("localhost", unused_tcp_port))
     assert event_queue.get_nowait() == (Event.CONN_FAIL, "")
 
-async def test_when_recv_will_queue_event(api, event_queue, server_fac):
-    async def send_yay(conn):
-        await conn.send('{"type": "msg_send", "message": "yay"}')
+@pytest.mark.parametrize("test_case", ["yay", "hax"])
+async def test_recv_correct_message(api, event_queue, server_fac, test_case):
+    async def send_to_server(conn):
+        await conn.send('{"type": "msg_send", "message": "%s"}' % test_case)
 
-    server, port = server_fac(send_yay)
+    server, port = server_fac(send_to_server)
     async with server:
         await api.connect(("localhost", port))
         await api.recv_event()
         await api.close()
 
-    assert event_queue.get_nowait() == (Event.MSG_RECV, "yay")
+    assert event_queue.get_nowait() == (Event.MSG_RECV, test_case)
 
 async def test_client_api_ignores_empty_messages(api, event_queue, server_fac):
     async def send_nothing(conn):
@@ -86,3 +87,4 @@ async def test_sends_messages_in_correct_format(api, event_queue, server_fac):
         await api.close()
 
     assert message == '{"type": "msg_send", "message": "yay"}'
+
