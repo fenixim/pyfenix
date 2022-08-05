@@ -50,4 +50,4 @@ class ClientEventLoop:
         elif event_type == Event.QUIT:
             self._done = True
         else:
-            logging.error(f"Unrecognized event type {event_type}")
+            logging.error("Unrecognized event type %s", event_type)
