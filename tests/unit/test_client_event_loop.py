@@ -1,3 +1,4 @@
+import asyncio
 import queue
 import threading
 
@@ -21,7 +22,7 @@ def gui(event_queue):
 
 @pytest.fixture
 def handler(event_queue, api, gui):
-    return ClientEventLoop(event_queue, api, gui)
+    return ClientEventLoop(event_queue, api, gui, asyncio.get_event_loop())
 
 def test_given_no_new_messages_when_poll_will_not_change_gui(gui, handler):
     handler.handle_next_event()
@@ -38,9 +39,10 @@ def test_given_two_messages_when_poll_twice_will_show_two(api, gui, handler):
     handler.handle_next_event()
     assert gui.get_messages() == ["yay", "yeet"]
 
-def test_when_send_message_will_send_through_api(api, gui, handler):
+async def test_when_send_message_will_send_through_api(api, gui, handler):
     gui.set_send("yay")
     handler.handle_next_event()
+    await asyncio.sleep(0.1)
     assert api.get_sent() == "yay"
 
 def test_when_fail_to_connect_will_show_connection_error(api, gui, handler):

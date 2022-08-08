@@ -1,5 +1,7 @@
 """API base class."""
 
+__all__ = ("API", "NoConnectionError")
+
 import asyncio
 from typing import Tuple
 

@@ -1,5 +1,7 @@
 """Runs the GUI interface."""
 
+__all__ = ("TkGUI",)
+
 from queue import Queue
 
 from tkinter.scrolledtext import ScrolledText
@@ -8,6 +10,9 @@ from tkinter import ttk
 
 from .event import Event
 from .gui import GUI
+
+_EMPTY_DISPLAY_ROW = 1
+_MAX_DISPLAY_ROWS = 40
 
 class TkGUI(GUI):
     """Defines the GUI methods."""
@@ -41,7 +46,9 @@ class TkGUI(GUI):
     def add_message(self, msg: str) -> None:
         """Print a message in the display window"""
         self._display_window["state"] = "normal"
-        if int(self._display_window.index("end").split(".")[0]) > 41:
+
+        last_row_number, _ = self._display_window.index("end".split("."))
+        if int(last_row_number) > _MAX_DISPLAY_ROWS + _EMPTY_DISPLAY_ROW:
             self._display_window.delete(1.0, 2.0)
         self._display_window.insert("end -1 chars", msg + "\n")
         self._display_window["state"] = "disabled"

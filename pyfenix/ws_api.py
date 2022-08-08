@@ -1,5 +1,7 @@
 """Implementation of the client API layer for websockets."""
 
+__all__ = ("WebsocketsAPI",)
+
 import json
 import logging
 import queue
@@ -51,7 +53,7 @@ class WebsocketsAPI(API):
 
 
     async def send(self, msg: str) -> None:
-        payload = {"type" : "msg_send", "message": msg}
+        payload = {"type" : "msg_send", "msg": msg}
 
         if self._conn is not None:
             await self._conn.send(json.dumps(payload))
@@ -65,7 +67,7 @@ class WebsocketsAPI(API):
 
         msg = json.loads(await self._conn.recv())
         if msg["type"] == "msg_broadcast":
-            text = msg["message"]
+            text = msg["msg"]
             if text:
                 self._queue.put((Event.MSG_RECV, text))
         else:

@@ -12,7 +12,7 @@ from .ws_api import WebsocketsAPI
 async def start_api(api: API) -> None:
     """Connect to API and start listener."""
     fut: asyncio.Future = asyncio.Future()
-    await api.connect(("localhost", 60221))
+    await api.connect(("localhost", 8080))
     asyncio.create_task(api.listen(fut))
     await fut
 
@@ -32,7 +32,7 @@ def main() -> None:
 
     gui = TkGUI(event_queue)
 
-    handler = ClientEventLoop(event_queue, api, gui)
+    handler = ClientEventLoop(event_queue, api, gui, loop)
     handler_thread = threading.Thread(target=handler.run)
     handler_thread.start()
 
