@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfenix"
+description = "An internet messaging app written in Python and Go."
+readme = "README.md"
+keywords = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+]
+urls = {source = "https://github.com/fenixim/pyfenix"}
+dependencies = [
+    "websockets",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyfenix.__version__"}
