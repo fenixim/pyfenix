@@ -3,6 +3,7 @@
 __all__ = ("API", "NoConnectionError")
 
 import asyncio
+import logging
 from typing import Tuple
 
 class API:
@@ -19,13 +20,24 @@ class API:
         """
         raise NotImplementedError
 
+    async def close(self) -> None:
+        """
+        Close the connection to the server.
+
+        Must be implemented by subclasses.
+        """
+        raise NotImplementedError
+
     async def listen(self, fut: asyncio.Future) -> None:
         """
         Listen for events.
         """
         while not self._done:
             await asyncio.sleep(0.2)
-            await self.recv_event()
+            try:
+                await self.recv_event()
+            except NoConnectionError:
+                logging.info("Connection closed, shutting down.")
 
         fut.set_result(None)
 

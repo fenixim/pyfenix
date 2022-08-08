@@ -8,6 +8,7 @@ import queue
 from typing import Optional, Tuple
 
 import websockets.client
+import websockets.exceptions
 
 from pyfenix.api import API, NoConnectionError
 from pyfenix.event import Event
@@ -65,7 +66,11 @@ class WebsocketsAPI(API):
         if self._conn is None:
             raise NoConnectionError()
 
-        msg = json.loads(await self._conn.recv())
+        try:
+            msg = json.loads(await self._conn.recv())
+        except websockets.exceptions.ConnectionClosedError as exc:
+            raise NoConnectionError() from exc
+
         if msg["type"] == "msg_broadcast":
             text = msg["msg"]
             if text:
