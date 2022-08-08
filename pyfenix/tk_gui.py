@@ -41,7 +41,6 @@ class TkGUI(GUI):
     def run(self) -> None:
         """Start the GUI."""
         self._root.mainloop()
-        self._display_window.insert("end -1 chars", "GUI mainloop started.")
 
     def add_message(self, msg: str) -> None:
         """Print a message in the display window"""
