@@ -47,7 +47,7 @@ class TkGUI(GUI):
         """Print a message in the display window"""
         self._display_window["state"] = "normal"
 
-        last_row_number, _ = self._display_window.index("end".split("."))
+        last_row_number, _ = self._display_window.index("end").split(".")
         if int(last_row_number) > _MAX_DISPLAY_ROWS + _EMPTY_DISPLAY_ROW:
             self._display_window.delete(1.0, 2.0)
         self._display_window.insert("end -1 chars", msg + "\n")
