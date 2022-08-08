@@ -1,11 +1,14 @@
 """Implementation of the client API layer for websockets."""
 
+__all__ = ("WebsocketsAPI",)
+
 import json
 import logging
 import queue
 from typing import Optional, Tuple
 
 import websockets.client
+import websockets.exceptions
 
 from pyfenix.api import API, NoConnectionError
 from pyfenix.event import Event
@@ -20,6 +23,7 @@ class WebsocketsAPI(API):
         self._conn: Optional[websockets.client.WebSocketClientProtocol] = None
         self._queue = event_queue
         self._server_uri: Optional[str] = None
+        super().__init__()
 
     async def connect(self, server: Tuple[str, int]) -> None:
         """
@@ -44,11 +48,13 @@ class WebsocketsAPI(API):
         Safe to call more than once.
         """
         if self._conn is not None:
+            self._done = True
             await self._conn.close()
             self._conn = None
 
+
     async def send(self, msg: str) -> None:
-        payload = {"type" : "msg_send", "message": msg}
+        payload = {"type" : "msg_send", "msg": msg}
 
         if self._conn is not None:
             await self._conn.send(json.dumps(payload))
@@ -60,9 +66,13 @@ class WebsocketsAPI(API):
         if self._conn is None:
             raise NoConnectionError()
 
-        msg = json.loads(await self._conn.recv())
+        try:
+            msg = json.loads(await self._conn.recv())
+        except websockets.exceptions.ConnectionClosedError as exc:
+            raise NoConnectionError() from exc
+
         if msg["type"] == "msg_broadcast":
-            text = msg["message"]
+            text = msg["msg"]
             if text:
                 self._queue.put((Event.MSG_RECV, text))
         else:

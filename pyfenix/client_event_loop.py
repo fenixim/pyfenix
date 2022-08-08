@@ -1,5 +1,7 @@
 """Event handler loop for all client events."""
 
+__all__ = ("ClientEventLoop",)
+
 import asyncio
 import logging
 import queue
@@ -11,7 +13,9 @@ from pyfenix.gui import GUI
 class ClientEventLoop:
     """Updates GUI on new events. Should not be run in main thread."""
 
-    def __init__(self, event_queue: queue.Queue, client_api: API, client_gui: GUI):
+    def __init__(self, event_queue: queue.Queue,
+                 client_api: API, client_gui: GUI,
+                 loop: asyncio.AbstractEventLoop):
         """
         :param event_queue: Event queue shared by the API and GUI layers
         :param client_api: API implementation of the Fenix protocol
@@ -19,6 +23,7 @@ class ClientEventLoop:
         """
         self._api = client_api
         self._gui = client_gui
+        self._loop = loop
         self._queue = event_queue
         self._done = False
 
@@ -44,7 +49,7 @@ class ClientEventLoop:
         if event_type == Event.MSG_RECV:
             self._gui.add_message(payload)
         elif event_type == Event.MSG_SEND:
-            asyncio.get_event_loop().run_until_complete(self._api.send(payload))
+            asyncio.run_coroutine_threadsafe(self._api.send(payload), self._loop)
         elif event_type == Event.CONN_FAIL:
             self._gui.conn_failed()
         elif event_type == Event.QUIT:

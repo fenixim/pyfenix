@@ -4,25 +4,39 @@ import asyncio
 from queue import Queue
 import threading
 
-from tests.doubles import GUIEventHandlerStub
-
+from .api import API
 from .client_event_loop import ClientEventLoop
+from .tk_gui import TkGUI
 from .ws_api import WebsocketsAPI
 
-async def main() -> None:
+async def start_api(api: API) -> None:
+    """Connect to API and start listener."""
+    fut: asyncio.Future = asyncio.Future()
+    await api.connect(("localhost", 8080))
+    asyncio.create_task(api.listen(fut))
+    await fut
+
+def spawn_api_thread(api: API) -> asyncio.AbstractEventLoop:
+    """Start an asyncio loop in another thread to run the API."""
+    loop = asyncio.get_event_loop()
+    api_thread = threading.Thread(target=loop.run_until_complete, args=(start_api(api),))
+    api_thread.start()
+
+    return loop
+
+def main() -> None:
     """Start Fenix client"""
     event_queue: Queue = Queue()
     api = WebsocketsAPI(event_queue)
-    await api.connect(("localhost", 60221))
-    await api.send("yay")
-    asyncio.create_task(api.listen())
+    loop = spawn_api_thread(api)
 
-    gui = GUIEventHandlerStub(event_queue)
+    gui = TkGUI(event_queue)
 
-    handler = ClientEventLoop(event_queue, api, gui)
+    handler = ClientEventLoop(event_queue, api, gui, loop)
     handler_thread = threading.Thread(target=handler.run)
     handler_thread.start()
 
-    await api.close()
+    gui.run()
+    asyncio.run_coroutine_threadsafe(api.close(), loop)
 
-asyncio.get_event_loop().run_until_complete(main())
+main()

@@ -1,5 +1,7 @@
 """GUI base class"""
 
+__all__ = ("GUI",)
+
 class GUI:
     """Base class for all client GUI implementations"""
 
